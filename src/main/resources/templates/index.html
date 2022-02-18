@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+
+    <title>主页</title>
+</head>
+<body class="easyui-layout">
+
+<div  data-options="region:'north'" style="height:100px;background-color:#F0F8FF" >
+<!--    当前时间-->
+
+    <!--    当前用户名-->
+    <div align="right"><span style="font-size: 20px ;color:mediumblue">欢迎用户:</span><span th:text="${session.user.name+','}" style="font-size: 24px; color: red" ></span><a th:href="@{/logout}"  style="font-size: 20px" >退出登录</a><br>
+        <span style="font-size: 20px ;color:mediumblue">当前账户余额为</span><span th:text="${session.user.balance}"style="font-size: 24px; color: red"></span><span style="font-size: 24px ;color:#0000cd">元</span><br>
+        <body onLoad="startTime()">
+        <span id="nowDateTimeSpan"   style="font-size: 20px;color:mediumblue "></span>
+        </body>
+    </div>
+
+
+</div>
+<div data-options="region:'center'" s>
+    <div class="easyui-layout" data-options="fit:true">
+        <div data-options="region:'center'">
+            <iframe name="ifr" height="100%" width="100%"></iframe>
+        </div>
+        <div data-options="region:'west',collapsed:false" title="--------菜单--------" style="width:180px;height: 100%" >
+
+            <div id="aa" class="easyui-accordion" style="width:100%;height: 100%">
+            <div title="取餐地点维护" data-options="iconCls:''"  >
+                <shiro:hasAnyRoles name="admin,keeper,finance">
+                    <a th:href="@{/selall.html}" id="selall" class="easyui-linkbutton c1" style="width:100%" target="ifr">添加/禁用/开启地点</a><br>
+                    </shiro:hasAnyRoles>
+            </div>
+
+            <div title="点餐下单" data-options="iconCls:'',selected:true" style="padding:0px;">
+                <div title="点餐下单" data-options="iconCls:'',fit:true"  >
+                    <a th:href="@{/addorder.html}" class="easyui-linkbutton c1" style="width:100%" target="ifr">开始点餐/结算</a><br>
+                    <a th:href="@{/order.html}" class="easyui-linkbutton c3" style="width:100%" target="ifr">查看今日订单</a><br>
+                    <a th:href="@{/weixin.html}" class="easyui-linkbutton c3" style="width:100%" target="ifr">微信充值</a><br>
+                </div>
+            </div>
+                    <div title="食物管理">
+                       <div title="食物维护" data-options="iconCls:'',fit:true"  >
+                           <shiro:hasAnyRoles name="admin,keeper,finance">
+                    <a th:href="@{/addorder.html}" class="easyui-linkbutton c1" style="width:100%" target="ifr">食物管理维护</a><br>
+                               </shiro:hasAnyRoles>
+                </div>
+</div>
+
+
+                    <div title="送货">
+                        <div title="送货维护" data-options="iconCls:'',fit:true"  >
+                            <shiro:hasAnyRoles name="admin,keeper,finance">
+                            <a th:href="@{/order.html}" class="easyui-linkbutton c1" style="width:100%" target="ifr">查看今日所有订单</a><br>
+                            <a th:href="@{/seldayorder.html}" class="easyui-linkbutton c1" style="width:100%" target="ifr">今日售出统计</a><br>
+                            </shiro:hasAnyRoles>
+                        </div>
+                    </div>
+
+                    <div title="余额充值">
+                        <div title="充值" data-options="iconCls:'',fit:true"  >
+                            <shiro:hasAnyRoles name="admin,finance">
+                            <a th:href="@{/upbalance.html}" class="easyui-linkbutton c1" style="width:100%" target="ifr">余额充值</a><br>
+                            <a th:href="@{/selbalanlog.html}" class="easyui-linkbutton c1" style="width:100%" target="ifr">查看充值记录</a><br>
+                            </shiro:hasAnyRoles>
+                        </div>
+                    </div>
+                </shiro:hasAnyRoles>
+                    <div title="用户信息维护">
+                        <div title="用户信息修改" data-options="iconCls:'',fit:true"  >
+                            <a href="#" class="easyui-linkbutton c1" style="width:100%" target="ifr">信息维护修改</a>
+
+                        </div>
+                    </div>
+
+    </div>
+    </div>
+</div>
+    </div>
+</body>
+<script>
+    $("#menu").accordion({
+        width:180,
+    })
+    function startTime()
+    {
+        var today=new Date();//定义日期对象
+        var yyyy = today.getFullYear();//通过日期对象的getFullYear()方法返回年
+        var MM = today.getMonth()+1;//通过日期对象的getMonth()方法返回年
+        var dd = today.getDate();//通过日期对象的getDate()方法返回年
+        var hh=today.getHours();//通过日期对象的getHours方法返回小时
+        var mm=today.getMinutes();//通过日期对象的getMinutes方法返回分钟
+        var ss=today.getSeconds();//通过日期对象的getSeconds方法返回秒
+        // 如果分钟或小时的值小于10，则在其值前加0，比如如果时间是下午3点20分9秒的话，则显示15：20：09
+        MM=checkTime(MM);
+        dd=checkTime(dd);
+        mm=checkTime(mm);
+        ss=checkTime(ss);
+        var day; //用于保存星期（getDay()方法得到星期编号）
+        if(today.getDay()==0)   day   =   "星期日 "
+        if(today.getDay()==1)   day   =   "星期一 "
+        if(today.getDay()==2)   day   =   "星期二 "
+        if(today.getDay()==3)   day   =   "星期三 "
+        if(today.getDay()==4)   day   =   "星期四 "
+        if(today.getDay()==5)   day   =   "星期五 "
+        if(today.getDay()==6)   day   =   "星期六 "
+        document.getElementById('nowDateTimeSpan').innerHTML=yyyy+"-"+MM +"-"+ dd +" " + hh+":"+mm+":"+ss+"   " + day;
+        setTimeout('startTime()',1000);//每一秒中重新加载startTime()方法
+    }
+
+    function checkTime(i)
+    {
+        if (i<10){
+            i="0" + i;
+        }
+        return i;
+    }
+
+</script>
+
+
+</html>

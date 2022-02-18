@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+   <script type="text/javascript">
+
+       if (window.top != window.self) {
+           window.top.location = window.self.location;
+       }
+   </script>
+    <title>登录</title>
+</head>
+<body>
+<div><h1>这是登录页面</h1></div>
+<div class="">
+
+    <a href="#" class="easyui-linkbutton">按钮1</a>
+    <shiro:hasAnyRoles name="ord">
+    <a href="#" class="easyui-linkbutton">按钮2</a>
+    </shiro:hasAnyRoles>
+    <shiro:hasAnyRoles name="amdin">
+    <a href="#" class="easyui-linkbutton">按钮3</a>
+    </shiro:hasAnyRoles>
+    <shiro:hasAnyRoles name="admin,ord">
+    <a href="#" class="easyui-linkbutton">按钮4</a>
+    </shiro:hasAnyRoles>
+
+</div>
+<div id="dd" class="easyui-dialog" title="请登录" align="center" style="width:300px;height:250px;"
+     data-options="iconCls:'icon-save',resizable:false,modal:true,closable:false,draggable:false">
+    <FORM id="ff" method="post">
+        <br>
+        <span>请输入账号:</span>
+        <br>
+        <input class="easyui-textbox" data-options="iconCls:'icon-man'"  name="username" style="width:200px">
+        <br>
+        <br>
+        <span>清输入密码:</span>
+        <br>
+        <input class="easyui-passwordbox" prompt="Password" iconWidth="28" name="password" style="width:200px;height:auto;padding:10px">
+        <br>
+        <br>
+        <a id="btn3" th:href="@{/register.html}" class="easyui-linkbutton">没有账号?去注册</a>
+        <a id="btn1" href="#" class="easyui-linkbutton">重新输入</a>
+        <a id="btn" href="#" class="easyui-linkbutton">确认登录</a>
+    </FORM>
+</div>
+</body>
+<script>
+    $(function(){
+        $('#btn').bind('click', function(){
+            // alert('easyui');
+            $('#ff').form('submit', {
+                url:"/login",
+                onSubmit: function(){
+
+                },
+                success:function(data){
+                    var json = JSON.parse(data);
+                    if (json.code==200){
+                        location.href="index.html"
+                    }
+                    else {
+                        alert(json.msg)
+                    }
+                }
+            });
+
+        });
+    });
+</script>
+</html>

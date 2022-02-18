@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+    <title>余额充值</title>
+</head>
+<body>
+<div>
+    <!--    拥有管理员,财务管理-->
+    <shiro:hasAnyRoles name="admin,finance ">
+
+    <div id="dd" class="easyui-dialog" align="center" title="余额充值" style="width:600px;height:400px;"
+         data-options=" left:0, top:0,closable:false , iconCls:'icon-save',resizable:true,modal:true">
+
+        <form id="ff" method="post">
+            <div><br><br><br>
+                需要查找的账号的手机号码:<br><br>
+                <input id="phone" name="phone" class="easyui-textbox"  style="width:200px"><br><br>
+
+                <a href="#" id="selbyph" class="easyui-linkbutton">点击查询用户</a><br><br>
+
+            </div>
+        </form>
+        <div id="upbalan" class="easyui-dialog" align="center" title="余额充值" style="width:600px;height:400px;"
+             data-options=" left:0, top:0,closable:true,closed:true , iconCls:'icon-save',resizable:true,modal:true">
+
+            <form id="upbalanff" method="post">
+                <div>
+                    <table>
+                        <div>
+                       <input class="easyui-textbox" type="hidden" id="upid" name="id" data-options="readonly:true" >
+                            <tr>
+                                <td><br>用户姓名:<span style="color: #c9302c">(*不可手动输入)</span> </tr>
+                            <td><input class="easyui-textbox"  id="upname" style="width:200px; text-align: center" data-options="readonly:true">
+                            <tr>
+                                <td><br>手机号码:<span style="color: #c9302c">(*不可手动输入)</span> </tr>
+                            <td>  <input class="easyui-textbox" id="upphone" style="width:200px; text-align: center"data-options="readonly:true">
+                            <tr>
+                                <td><br>当前余额(元):<span style="color: #c9302c">(*不可手动输入)</span> </tr>
+                            <td><input class="easyui-textbox" id="upbalance" style="width:200px; text-align: center" data-options="readonly:true">
+                            <tr>
+                                <td><br>充值金额:</tr></div> </tr>
+                        <td><select id="cc" class="easyui-combobox" name="balance" style="width:200px; text-align: center">
+                            <option>选择充值金额</option>
+                        <option value="50" selected>充值50元</option>
+                        <option value="100">充值100元</option>
+                        <option value="200">充值200元</option>
+                        <option value="500">充值500元</option>
+                    </select>
+                    </table>
+
+                    <br>
+                    <a href="#" id="upbalanbutton" class="easyui-linkbutton">点击充值</a><br><br>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</shiro:hasAnyRoles>
+</body>
+<script>
+    //添加根据手机号码查询用户按键 事件
+    $("#selbyph").linkbutton({
+        onClick:function () {
+            $("#ff").form("submit",{
+                url:"selbyphone",
+                success: function(data){
+                    var json = JSON.parse(data);
+                    if (json.code==200){
+                        $("#upid").textbox({
+                            value:json.id
+                        })
+                        $("#upname").textbox({
+                            value:json.name
+                        })
+                        $("#upphone").textbox({
+                            value:json.phone
+                        })
+                        $("#upbalance").textbox({
+                            value:json.balance
+                        })
+                        $("#upbalan").dialog({
+                            closed:false
+
+                        })
+                    }else {
+                        alert(json.msg)
+                    }
+
+                }
+
+            })
+
+        }
+    })
+//添加点击充值按钮事件
+    $("#upbalanbutton").linkbutton({
+        onClick:function () {
+            $.ajax({
+                url:"upuserbalance",
+                type:"post",
+                dataType:"json",
+                data:{"id" :$("#upid").textbox("getValue"),"balance":parseInt($("#cc").combobox("getValue"))},
+                success:function (data) {
+
+                    if (data.code==200){
+                        $("#upbalance").textbox({
+                            value:data.balance
+                        })
+                        alert(data.msg)
+                    }else {
+                        alert(data.msg)
+                    }
+
+                }
+            })
+
+
+        }
+    })
+</script>
+</html>

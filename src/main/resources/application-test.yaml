@@ -1,0 +1,25 @@
+#设置tomcat端口号
+server:
+  port: 80
+  servlet:
+    context-path: /
+spring:
+  thymeleaf:
+    cache: false  #关闭缓存
+    prefix: classpath:/templates/ #设置视图前缀
+    suffix: .html #设置视图后缀
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dh?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
+    password: Xiaosa1018
+    username: root
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/templates/
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+logging:
+  level:
+    root: info
+    com.dhf.dh: debug

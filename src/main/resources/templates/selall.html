@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+    <title>取餐地点</title>
+</head>
+<body>
+
+    <table id="tab" class="easyui-datagrid" loadMsg="正在加载" title="取餐地点"
+           data-options="url:'selall?addressdisable=all',fit:true,border:false,fitColumns:true,singleSelect:true" >
+        <thead >
+        <tr >
+            <th data-options="field:'charbox',checkbox:true,align:'center'"></th>
+            <th data-options="field:'id',width:'30PX',align:'center'">地点ID</th>
+            <th data-options="field:'mealaddress',width:'50PX',align:'center'">地点名称</th>
+            <th data-options="field:'addressdisable',width:'50px',align:'center' ,formatter:f">启用/禁用</th>
+        </tr>
+        </thead>
+    </table>
+
+<div align="center">
+    <div id="dd" class="easyui-dialog" title="添加新的取餐地点" align="center" style="width:300px;height:400px;"
+         data-options="iconCls:'icon-man',resizable:false,modal:true,closable:true,draggable:false">
+        <form id = "addff" method="post" >
+            <table align="center">
+                <tr>
+                    <br><br><br>
+                    <td align="center">添加新的取餐地点:</td>
+                </tr>
+                <tr>
+                    <td><input class="easyui-textbox" name="mealaddress" style="width:200px">
+                </tr>
+
+            </table>
+        </form>
+        <br>
+        <br>
+
+        <div align="center">
+            <tr>
+                <td><shiro:hasAnyRoles name="admin,keeper">
+                    <a id="addbtn" href="#" class="easyui-linkbutton" style="width:100px">点击添加</a>
+                    <a id="clobtn" href="#" class="easyui-linkbutton" style="width:100px">取消添加</a>
+                    </shiro:hasAnyRoles>
+                </td>
+
+            </tr>
+        </div>
+    </div>
+
+</div>
+<dib>
+    <div id="tb" align="right">
+        <!--    拥有管理员,食堂管理,财务管理-->
+             <shiro:hasAnyRoles name="admin,keeper,finance">
+        <a href="#" id="tr" class="easyui-linkbutton" >启用取餐地点</a>
+        <a href="#" id= "fa" class="easyui-linkbutton" >禁用取餐地点</a>
+        <a href="#" id="add" class="easyui-linkbutton">添加新的取餐地点</a>
+            </shiro:hasAnyRoles>
+    </div>
+</dib>
+</body>
+
+<script>
+    //取餐地点隐藏
+    $("#dd").dialog({
+        closed:true
+    })
+    //格式化禁用状态
+    trfa:function f(value,row,index) {
+        if (value=='true'){
+            return"启用";
+        }else {
+            return "禁用";
+        }
+    }
+    $("#tab").datagrid({
+        toolbar:"#tb",
+
+    })
+    //启用地点按钮事件
+    $("#tr").linkbutton({
+        onClick:function () {
+            var addsel = $("#tab").datagrid("getSelected");
+            if (addsel!=null){
+                $.ajax({
+                    type:"post",
+                    url:"upadd",
+                    data:{"id":addsel.id ,"addressdisable":"true"},
+                    dataType:"json",
+                    success:function (data) {
+                        if (data.code==200){
+                            $("#tab").datagrid("load");
+
+                            alert(data.msg);
+                       }else {
+                           alert(data.msg);
+                       }
+                    }
+
+                })
+            }else {
+                alert("请选择一行数据")
+            }
+        }
+    })
+
+    //禁用按钮事件
+    $("#fa").linkbutton({
+        onClick:function () {
+            var addsel = $("#tab").datagrid("getSelected");
+            if (addsel!=null){
+                $.ajax({
+                    type:"post",
+                    url:"upadd",
+                    data:{"id":addsel.id ,"addressdisable":"false"},
+                    dataType:"json",
+                    success:function (data) {
+
+                        if (data.code==200){
+                            $("#tab").datagrid("load");
+                            alert(data.msg);
+                        }else {
+                            alert(data.msg);
+                        }
+                    }
+
+                })
+            }else {
+                alert("请选择一行数据")
+            }
+        }
+    })
+    //取餐地点隐藏
+    $("#dd").dialog({
+        closed:true
+    })
+    //取消添加按钮事件
+    $("#clobtn").linkbutton({
+        onClick:function () {
+            $("#dd").dialog({
+                closed:true
+            })
+
+        }
+    })
+    $("#add").linkbutton({
+        onClick:function () {
+            $("#dd").dialog({
+                closed:false
+            })
+
+        }
+    })
+    //添加地点按钮ajax事件
+    $("#addbtn").linkbutton({
+        onClick:function () {
+            // $.messager.progress();
+            $("#addff").form("submit",{
+                type:"post",
+                url:"insadd",
+                success: function(data){
+                    // $.messager.progress('close');	// 如果提交成功则隐藏进度条
+                    var json =JSON.parse(data);
+                    $("#dd").dialog({
+                        closed:true,
+                    })
+                    $("#tab").datagrid("load");
+
+                    if (json.code ==200){
+                        alert(json.msg);
+
+                    }else {
+                        alert(json.msg);
+                    }
+                }
+
+            })
+
+
+        }
+    })
+</script>
+</html>

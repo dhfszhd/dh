@@ -1,0 +1,4 @@
+#设置配置文件为test的生效
+spring:
+  profiles:
+    active: test

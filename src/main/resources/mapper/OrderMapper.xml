@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dhf.dh.mapper.OrderMapper">
+<!--    自定打印订单返回对象-->
+    <resultMap id="excelmap" type="com.dhf.dh.entity.DayOrderExcel">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="phone" property="phone"/>
+        <result column="foodname" property="foodname"/>
+        <result column="foodtotal" property="foodtotal"/>
+        <result column="ordertime" property="ordertime"/>
+        <result column="orderdisable" property="orderdisable"/>
+        <result column="mealaddress" property="mealaddress"/>
+
+    </resultMap>
+<!--    按照用户账号 查询当天的订单 订单状态是true-->
+    <select id="selorbyusername" resultType="com.dhf.dh.entity.Order" parameterType="com.dhf.dh.entity.Users">
+        select id,username,
+                name,phone,
+                foodname,foodprice,
+                foodtotal,foodamount,
+                ordertime,orderdisable
+        from `order`
+        where username = #{username}
+        and ordertime like CONCAT('%',(SELECT CURRENT_DATE),'%')
+        and orderdisable='true'
+    </select>
+<!--    按照条件查询所有订单 订单状态是true的-->
+    <select id="selorderall" resultType="com.dhf.dh.entity.Order" parameterType="com.dhf.dh.entity.SelQuest">
+        select id,username,
+                name,phone,
+                foodname,foodprice,
+                foodtotal,foodamount,
+                ordertime,orderdisable
+        from `order`
+        where 1=1
+        <if test="onlydate !=null and onlydate !='' ">
+            and ordertime like CONCAT('%',#{onlydate},'%')
+        </if>
+        <if test="keyword !=null and keyword !=''">
+            and phone = #{keyword}
+        </if>
+        <if test="sort !=null and sort !=''">
+            order by ${sort} ${order}
+        </if>
+
+    </select>
+<!--    添加新的订单-->
+    <insert id="addorder" >
+        insert  into `order` (username,name,phone,
+                            foodname,foodprice,foodtotal,
+                            foodamount,ordertime,orderdisable)
+        values (#{username},#{name},#{phone},
+                #{foodname},#{foodprice},#{foodtotal},
+                #{foodamount},now(),'true')
+    </insert>
+<select id="ondayorder" resultType="com.dhf.dh.entity.Order">
+    select foodname ,SUM(foodtotal)foodtotal , SUM(foodamount)foodamount
+    from `order`
+    where  ordertime like CONCAT('%',(SELECT CURRENT_DATE),'%')
+    and orderdisable='true'
+	GROUP BY foodname
+</select>
+<!--   打印今日订单-->
+    <select id="dayexcel" resultType="com.dhf.dh.entity.DayOrderExcel">
+        select o.id id , o.name,o.phone,o.foodname,o.foodtotal,o.ordertime,o.orderdisable,a.mealaddress mealaddress
+        from `order` o
+				LEFT JOIN users u
+				ON o.username=u.username
+				LEFT JOIN address a
+				ON u.address = a.id
+				where o.ordertime like CONCAT('%',(SELECT CURRENT_DATE),'%')
+        and o.orderdisable='true'
+        order by a.mealaddress ,o.id  ASC
+
+    </select>
+</mapper>

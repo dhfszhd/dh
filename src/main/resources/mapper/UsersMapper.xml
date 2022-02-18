@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dhf.dh.mapper.UsersMapper">
+<!--    通过账号密码查询用户-->
+<select id="selByusps" resultType="com.dhf.dh.entity.Users">
+    select id,username,password,name,phone,balance,address,role,chargeback,userdisable,register
+    from users
+    where username = #{username}
+    and password = #{password}
+</select>
+<!--    选择性查询用户
+            id
+            账号 姓名
+            电话 取消次数
+            禁用状态-->
+    <select id="selByAll" resultType="com.dhf.dh.entity.Users">
+        select id,username,password,name,phone,balance,address,role,chargeback,userdisable,register
+    from users
+    where 1=1
+    <if test="id != null and id != ''">
+        and id = #{id}
+    </if>
+    <if test="username != null and username != ''">
+        and username = #{username}
+    </if>
+    <if test="name != null and name != ''">
+        and name = #{name}
+    </if>
+    <if test="phone != null and phone != ''">
+        and phone = #{phone}
+    </if>
+    <if test="chargeback != null and chargeback != ''">
+        and chargeback = #{chargeback}
+    </if>
+    <if test="userdisable != null and userdisable != ''">
+        and userdisable = #{userdisable}
+    </if>
+    </select>
+<!--    添加新的用户-->
+    <insert id="insUser">
+        insert into users (
+        username,password,name,
+        phone,address,register
+        )
+        values (#{username},#{password},#{name},#{phone},#{address},now())
+    </insert>
+<!--    更新用户资料
+        密码 余额 取餐地点 角色 取消次数 禁用状态-->
+    <update id="upUser">
+        update users set
+        password= #{password},
+        balance= #{balance},
+        address= #{address},
+        role =#{role},
+        chargeback= #{chargeback},
+        userdisable= #{userdisable}
+        where
+        id = #{id}
+    </update>
+<!--    选择更新用户资料-->
+    <update id="upUserAll">
+        update users
+        <set>
+        <if test="password !=null and password !=''">
+            password= #{password},
+        </if>
+        <if test="balance !=null ">
+            balance= #{balance},
+        </if>
+        <if test="address !=null ">
+            address= #{address},
+        </if>
+        <if test="role !=null ">
+            role= #{role},
+        </if>
+        <if test="chargeback !=null">
+            chargeback= #{chargeback},
+        </if>
+        </set>
+        where
+         id= #{id}
+    </update>
+<!--    充值余额-->
+    <update id="upUserBalance" parameterType="com.dhf.dh.entity.Users">
+        update users
+        <set>
+            <if test="balance !=null ">
+                balance= #{balance},
+            </if>
+        </set>
+        where
+        id= #{id}
+    </update>
+</mapper>

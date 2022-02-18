@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+
+    <title>实时销售数量</title>
+</head>
+<body>
+<!--    拥有管理员,食堂管理,财务管理-->
+<shiro:hasAnyRoles name="admin,keeper,finance ">
+
+<table id="tab" class="easyui-datagrid" title="实时销售数量(间隔10秒获取一次最新订单)"
+       data-options="url:'ondayorder',fit:true,fitColumns:false,singleSelect:true">
+    <thead>
+    <tr>
+        <th data-options="field:'foodname'" align="center">食物名称</th>
+        <th data-options="field:'foodtotal'" align="center">当前售出数量(份)</th>
+        <th data-options="field:'foodamount'" align="center">当天出售总价元</th>
+        <th id="view" data-options="field:'long',formatter:total">销售数量阶级图形</th>
+
+    </tr>
+    </thead>
+</table>
+
+</shiro:hasAnyRoles>
+</body>
+<script>
+    function total() {
+         return "<div class='view' style='background: #0E2D5F ;width: 0px'>|</div>"
+}
+    $("#tab").datagrid({
+        onLoadSuccess:function (data) {
+            // $("#tab").datagrid('getColumnOption','long').
+            for(var i=0;i<data.rows.length;i++)
+            {
+
+               $(".view")[i].style.width=data.rows[i].foodtotal+'px';
+               $("#tab").datagrid("autoSizeColumn","long")
+
+            }
+        }
+    })
+
+    setInterval(function(){ $('#tab').datagrid('load') },10000);
+</script>
+</html>

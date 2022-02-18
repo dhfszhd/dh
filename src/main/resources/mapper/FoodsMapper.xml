@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dhf.dh.mapper.FoodsMapper">
+<!--    查找食物-->
+    <select id="selfoods" resultType="com.dhf.dh.entity.Foods">
+        select id,
+        foodname,
+        foodprice,
+        foodstock,
+        fooddisable
+        from foods
+        where 1=1
+        <if test="fooddisable ==null || fooddisable=='' ">
+           and fooddisable="true"
+        </if>
+    </select>
+<!--    按照条件查找食物-->
+    <select id="selfoodsall" resultType="com.dhf.dh.entity.Foods">
+        select id,
+                foodname,
+                foodprice,
+                foodstock,
+                fooddisable
+        from foods
+        where 1=1
+    <if test="id !=null">
+        and id=#{id}
+    </if>
+    <if test="foodname !=null and foodname!=''">
+        and foodname=#{foodname}
+    </if>
+    <if test="foodprice !=null">
+        and foodprice=#{foodprice}
+    </if>
+    <if test="foodstock !=null">
+        and foodstock=#{foodstock}
+    </if>
+    <if test="fooddisable !=null and fooddisable!=''">
+        and fooddisable=#{fooddisable}
+
+    </if>
+    </select>
+<!--添加食物-->
+    <insert id="insfood">
+    insert into foods (foodname,foodprice,foodstock)
+    values (#{foodname} ,#{foodprice},#{foodstock})
+    </insert>
+<!--    按照条件添加食物.-->
+    <insert id="insfoodall">
+    insert into foods
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+        <if test="foodname !=null and foodname !=''">
+            foodname,
+        </if>
+        <if test="foodprice !=null ">
+            foodprice,
+        </if>
+        <if test="foodstock !=null ">
+            foodstock,
+        </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+        <if test="foodname !=null and foodname !=''">
+            #{foodname},
+        </if>
+        <if test="foodprice !=null ">
+           #{foodprice},
+        </if>
+        <if test="foodstock !=null ">
+            #{foodstock},
+        </if>
+    </trim>
+    </insert>
+<!--    更新食物-->
+    <update id="upfood">
+        update foods set
+        foodprice=#{foodprice},
+        foodstock=#{foodstock},
+        fooddisable=#{fooddisable}
+        where id=#{id}
+    </update>
+<!--    按条件 更新 食物属性-->
+    <update id="upfoodall">
+        update foods
+        <set>
+        <if test="foodprice !=null ">
+             foodprice=#{foodprice},
+        </if>
+        <if test="foodstock !=null">
+            foodstock = #{foodstock},
+        </if>
+        <if test="fooddisable !=null">
+            fooddisable = #{fooddisable}
+        </if>
+        </set>
+        where id=#{id}
+    </update>
+</mapper>

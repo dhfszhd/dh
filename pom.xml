@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--   maven 工程版本,不变-->
+    <modelVersion>4.0.0</modelVersion>
+    <!--   这个项目的父工程-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.2</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <!--当前项目的GAV坐标-->
+    <groupId>com.dhf</groupId>
+    <artifactId>dh</artifactId>
+    <version>22.1.13</version>
+
+    <!--    这个项目的名字和描述 ,可有可无,可以删除-->
+    <name>dh</name>
+    <description>Demo project for Spring Boot</description>
+
+    <!--   指定编译的版本-->
+    <properties>
+        <java.version>11</java.version>
+    </properties>
+<!--依赖-->
+    <dependencies>
+
+        <!--        springboot框架web起步依赖  web工程必须有这个依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--        springboot测试起步依赖-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-test</artifactId>-->
+<!--            <scope>test</scope>-->
+<!--        </dependency>-->
+
+        <!--    添加jsp的依赖   需要在插件里面指定编译位置 springboot默认规定好的jsp的位置 -->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.tomcat.embed</groupId>-->
+<!--            <artifactId>tomcat-embed-jasper</artifactId>-->
+<!--        </dependency>-->
+        <!--thymeleaf 模板依赖
+        springboot不能直接访问thy中的资源-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+<!--        添加mysql驱动-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+<!--        热部署依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+<!--            这个依赖可以传递-->
+            <optional>true</optional>
+        </dependency>
+<!--        mybatis整合springboot依赖-->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+<!--        数据库查询分页依赖-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+<!--        引入shiro整合boot的依赖起步-->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring-boot-starter</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+<!--        引入shiro角色的缓存依赖-->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-ehcache</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+<!--        sjiro整合boot 的thy标签控制权限依赖-->
+        <dependency>
+            <groupId>com.github.theborakompanioni</groupId>
+            <artifactId>thymeleaf-extras-shiro</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+<!--        加入easyexcel的依赖,生成Excel表,用于下载今日的订单-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+    </dependencies>
+<!--插件-->
+    <build>
+<!--        &lt;!&ndash;  springboot默认用thymeleaf模板-->
+<!--              springboot集成jsp默认位置是规定好的-->
+<!--              是META-INF/resources文件内&ndash;&gt;-->
+<!--        <resources>-->
+<!--            <resource>-->
+<!--&lt;!&ndash;               源文件&ndash;&gt;-->
+<!--                <directory>src/main/webapp</directory>-->
+<!--&lt;!&ndash;                编译后的文件&ndash;&gt;-->
+<!--                <targetPath>META-INF/resources</targetPath>-->
+<!--                <includes>-->
+<!--&lt;!&ndash;                    需要编译的文件 *.*所有文件名和后缀名&ndash;&gt;-->
+<!--                    <include>*.*</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+        <plugins>
+            <plugin>
+                <!--            springboot项目编译打包插件-->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

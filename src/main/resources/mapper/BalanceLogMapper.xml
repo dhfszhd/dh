@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dhf.dh.mapper.BalanceLogMapper">
+<!--    添加新的充值记录-->
+    <insert id="addBalanceLog" parameterType="com.dhf.dh.entity.BalanceLog">
+        insert  into balancelog (upuser,oldbalance,charge,newbalance,currentuser,time)
+        values (#{upuser},#{oldbalance},#{charge},#{newbalance},#{currentuser},now())
+    </insert>
+<!--    查询所有充值记录 按照条件-->
+    <select id="selBalanceLogAll" resultType="com.dhf.dh.entity.BalanceLog" parameterType="com.dhf.dh.entity.SelQuest">
+        select id,upuser,oldbalance,charge,newbalance,currentuser,time
+        from balancelog
+        where 1=1
+        <if test="onlydate !=null and onlydate!='' " >
+            and time like CONCAT('%',#{onlydate},'%')
+        </if>
+        <if test="keyword !=null and keyword !=''">
+            and upuser = #{keyword}
+        </if>
+        <if test="sort !=null and sort !=''">
+            order by ${sort} ${order}
+        </if>
+    </select>
+</mapper>

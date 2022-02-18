@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+    <title>订餐</title>
+</head>
+<body>
+
+<div id="adbut" align="right">
+<!--    拥有管理员,食堂管理-->
+    <shiro:hasAnyRoles name="admin,keeper,finance">
+        <span style="color:#ff0000" >*默认只能显示上架中的.如需全部显示请点击---></span>
+        <a href="#" id="selallfood" class="easyui-linkbutton" data-options="size:'large'" >查看所有食物</a>
+        <a href="#" id="addfood" class="easyui-linkbutton" data-options="size:'large'" >添加新的食物</a>
+        <a href="#" id="upfooddisable" class="easyui-linkbutton" data-options="size:'large'" >设置上架/下架</a>
+        <a href="#" id="upfood" class="easyui-linkbutton" data-options="size:'large'" >修改食物单价/库存</a>
+    </shiro:hasAnyRoles>
+
+    <!--    拥有普通用户权限-->
+          <shiro:hasAnyRoles name="ord">
+    <a href="#" id="clecart" class="easyui-linkbutton" data-options="size:'large'" >清空购物车</a>
+    <a href="#" id="selcart" class="easyui-linkbutton" data-options="size:'large'" >查看购物车</a>
+          </shiro:hasAnyRoles>
+</div>
+<table id="tab1" class="easyui-datagrid" loadMsg="正在加载...." title="订餐"
+       data-options= "url:'selfoods',method:'post',
+                fit:true,border:false,fitColumns:false,singleSelect:true" >
+    <thead >
+    <tr>
+        <th data-options="field:'charbox',checkbox:true,align:'center'"></th>
+
+            <th data-options="field:'id',align:'center'">----</th>
+
+        <th data-options="field:'foodname',align:'center'" width="200">食物名称</th>
+        <th data-options="field:'foodprice',align:'center'" width="150">食物单价(元)</th>
+        <th data-options="field:'foodstock',align:'center'" width="150">库存</th>
+        <th data-options="field:'fooddisable',align:'center',formatter:f" width="150">上架/下架</th>
+        <!--    拥有普通用户-->
+              <shiro:hasAnyRoles name="ord">
+        <th data-options="field:'foodtotal',align:'center',formatter:total">订购数量</th>
+        <th data-options="field:'addcart',align:'center',formatter:adcart" width="100"></th>
+            </shiro:hasAnyRoles>
+
+    </tr>
+    </thead>
+</table>
+<!--购物车结算-->
+<div align="center">
+    <div id="dd" class="easyui-dialog" title="查看购物车" align="center" style="width:300px;height:400px;"
+         data-options="closed:true,iconCls:'icon-man',resizable:false,modal:true,closed:true,closable:false,draggable:false">
+        <table id="selca" class="easyui-datagrid" loadMsg="正在加载...." title=""
+               data-options= "url:'selcart',method:'post',
+                fit:true,border:false,fitColumns:true,singleSelect:true" >
+            <thead >
+            <tr>
+                <th data-options="field:'foodname',align:'center'">食物名称</th>
+                <th data-options="field:'foodprice',align:'center'">食物单价(元)</th>
+                <th data-options="field:'foodtotal',align:'center'">订购数量</th>
+                <th data-options="field:'foodamount',align:'center'">总价</th>
+            </tr>
+            </thead>
+
+            <!--    拥有[普通用户]-->
+                  <shiro:hasAnyRoles name="ord">
+            <a id="check" href="#" class="easyui-linkbutton" style="width:100px">点击结算</a>
+            <a id="comeon" href="#" class="easyui-linkbutton" style="width:100px">继续购物</a>
+                  </shiro:hasAnyRoles>
+        </table>
+
+        </div>
+
+</div>
+<!--添加上架新食物对话框-->
+<div align="center">
+    <div id="ddaddfood" class="easyui-dialog" title="添加新的食物" align="center" style="width:300px;height:400px;"
+         data-options="closed:true,iconCls:'icon-man',resizable:false,modal:true,closable:true,draggable:false">
+        <form id = "addnewfood" method="post" >
+            <table align="center">
+                <tr>
+                    <br>
+                   <h3>---添加新的食物---</h3>
+                </tr>
+                <tr>新食物的名字:<br>
+                <tr><input class="easyui-textbox" name="foodname" style="width:200px;text-align: center"></tr><br>
+                <tr> 单价(元):</tr><br>
+                <tr><input class="easyui-textbox" name="foodprice" style="width:200px;text-align: center"></tr><br>
+                <tr>食物库存(不添加默认是0):</tr><br>
+                <tr><input class="easyui-textbox" name="foodstock" style="width:200px;text-align: center"></tr><br>
+            </table>
+        </form>
+        <br>
+        <br>
+
+        <div align="center">
+            <tr>
+                <td>
+                    <!--    拥有管理员,食堂管理,财务管理-->
+                    <shiro:hasAnyRoles name="admin,keeper,finance ">
+                    <a id="addbtn" href="#" class="easyui-linkbutton" style="width:100px">点击添加</a>
+                    <a id="clobtn" href="#" class="easyui-linkbutton" style="width:100px">取消添加</a>
+                    </shiro:hasAnyRoles>
+                </td>
+
+            </tr>
+        </div>
+    </div>
+
+</div>
+<!--修改食物单价/库存的对话框-->
+<div align="center">
+    <div id="upfoodpsd" class="easyui-dialog" title="添加新的食物" align="center" style="width:300px;height:400px;"
+         data-options="closed:true,iconCls:'icon-man',resizable:false,modal:true,closable:true,draggable:false">
+        <form id = "upfoods" method="post" >
+            <table align="center">
+                <tr>
+                    <br>
+                    <h3>--更新食物单价/库存---</h3>
+                </tr>
+                <tr>食物ID:<br>
+                <tr><input class="easyui-textbox" id= "upfoodid" name="id" data-options="editable:false" style="width:200px;text-align: center"></tr><br>
+                <tr>要修改的食物的名字:<br>
+                <tr><input class="easyui-textbox" id= "upfoodname"name="foodname" data-options="editable:false" style="width:200px;text-align: center"></tr><br>
+                <tr> 设置单价(元):</tr><br>
+                <tr><input class="easyui-textbox" id= "upfoodprice" name="foodprice" style="width:200px;text-align: center"></tr><br>
+                <tr>设置食物库存:</tr><br>
+                <tr><input class="easyui-textbox"  id= "upfoodstock" name="foodstock" style="width:200px;text-align: center"></tr><br>
+            </table>
+        </form>
+        <br>
+        <br>
+
+        <div align="center">
+            <tr>
+                <td><!--    拥有管理员,食堂管理,财务管理-->
+                    <shiro:hasAnyRoles name="admin,keeper,finance ">
+                    <a id="upbtn" href="#" class="easyui-linkbutton" style="width:100px">确认修改</a>
+                    <a id="colesbtn" href="#" class="easyui-linkbutton" style="width:100px">取消修改</a>
+                     </shiro:hasAnyRoles>
+                </td>
+
+            </tr>
+        </div>
+    </div>
+
+</div>
+</body>
+<script>
+
+    //格式化禁用状态
+    function f(value,row,index) {
+        if (value=='true'){
+            return"上架中";
+        }else {
+            return "已下架";
+        }
+    }
+
+//给表格添加工具栏按钮
+    $("#tab1").datagrid({
+        toolbar:"#adbut",
+    })
+    //格式化订购数量
+    function total() {
+        return "<input class='foodtotal' name = foodtotal,style=width:80% > 份"
+    }//格式化加入购物车按钮
+    function adcart(){
+        return "<a class='addcart' href='#' style='width: auto'>加入购物车</a>"
+    }
+
+    //这是订购数量按钮
+    $("#tab1").datagrid({
+        onLoadSuccess:function () {
+            $(".foodtotal").numberspinner({
+                labelPosition:'center',
+                spinAlign:'horizontal',
+                value:0,
+                min:0,
+                max:99,
+                precision:0,
+                editable:false,
+            })
+            $(".addcart").linkbutton({
+                //添加购物车的按钮实践
+                onClick:function () {
+                    var addsel = $("#tab1").datagrid("getSelected");
+                    if (addsel!=null){
+                        var id = addsel.id;
+                        var foodtotal =$(this).parent().parent().parent().children().eq(6).children().children().find("input").val();
+                        if (id!==null && foodtotal>0){
+                            $.ajax({
+                                type:"post",
+                                dataType:"json",
+                                url:"addcart",
+                                data:{"id":id,"foodtotal":foodtotal},
+                                success:function (data) {
+                                    if (data.code==200){
+                                        $(".foodtotal").numberspinner("reset");
+                                        alert(data.msg)
+                                    } else if (data.code==400){
+                                        $(".foodtotal").numberspinner("reset");
+                                        alert(data.msg)
+                                    }else if (data.code==401){
+                                        $(".foodtotal").numberspinner("reset");
+                                        alert(data.msg)
+                                    }else if (data.code==402){
+                                        $(".foodtotal").numberspinner("reset");
+                                        alert(data.msg)
+                                    }else {
+                                        $(".foodtotal").numberspinner("reset");
+                                        alert("添加失败,未知错误");
+                                    }
+
+
+                                }
+                            })
+                        }else {
+                            alert("请选择食物,和正确的数量");
+                        }
+                    }
+                }
+            })
+
+
+        }
+    })
+
+    //隐藏购物车
+    $("#comeon").linkbutton({
+        onClick:function () {
+            $("#selca").datagrid("reload");
+
+            $("#dd").dialog({
+
+                closed:true
+            })
+
+        }
+    })
+    //查询购物车按钮事件 ,并且重新加载购物车
+    $("#selcart").linkbutton({
+        onClick:function () {
+            $("#selca").datagrid("reload");
+            $("#dd").dialog({
+                closed:false
+            })
+
+        }
+    })
+
+    //清空购物车按钮事件
+    $("#clecart").linkbutton({
+        onClick:function () {
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url:"clecart",
+                success:function (data) {
+                    if (data.code==200){
+                        $("#selca").datagrid("reload");
+                        alert(data.msg);
+                    }else {
+                        alert("清空购物车失败,错误未知");
+                    }
+
+                }
+            })
+        }
+    })
+    //点击结算事件
+    $("#check").linkbutton({
+        onClick:function () {
+            $.ajax({
+                url:"check",
+                dataType:"json",
+                type:"post",
+                success:function (data) {
+                    alert(data.code)
+                    if (data.code==200){
+                        $("#selca").datagrid("load")
+                        $("#tab1").datagrid("load")
+                        alert(data.msg);
+                    }else {
+                        alert(data.msg)
+                    }
+
+                }
+            })
+        }
+    })
+//查看所有食物
+    $("#selallfood").linkbutton({
+        onClick:function () {
+            $("#tab1").datagrid({
+                url:"selfoods?fooddisable=all"
+            })
+        }
+    })
+    $("#upfooddisable").linkbutton({
+        onClick:function () {
+            var sel = $("#tab1").datagrid("getSelected");
+            if (sel!=null){
+                var disa = "true";
+                if (sel.fooddisable=="true"){
+                    disa="false";
+                }else {
+                    disa="true"
+                }
+                $.ajax({
+                    type:"post",
+                    dataType:"json",
+                    data: {"id":sel.id,"fooddisable":disa},
+                    url:"upfoodpsd",
+                    success:function (data) {
+                        if (data.code==200){
+                            alert(data.msg);
+                            $("#tab1").datagrid("reload");
+                        }else {
+                            alert(data.msg);
+                        }
+                    }
+                })
+
+            }else {
+                alert("请选择要修改的行")
+            }
+        }
+    })
+    //更新食物库存和价格
+    $("#upfood").linkbutton({
+        onClick:function () {
+            var sel = $("#tab1").datagrid("getSelected");
+            if (sel!=null){
+                $("#upfoodpsd").dialog({
+                    closed:false,
+                })
+                $("#upfoodid").textbox({
+                    value:sel.id,
+                    readonly:true,
+                })
+                $("#upfoodname").textbox({
+                    value:sel.foodname,
+                    readonly:true,
+                })
+                $("#upfoodprice").textbox({
+                    value:sel.foodprice,
+                })
+                $("#upfoodstock").textbox({
+                    value:sel.foodstock ,
+                })
+
+
+            }else {
+                alert("请选择要修改的数据行");
+            }
+        }
+    })
+    //修改库存/价格按钮事件 提交表单
+    $("#upbtn").linkbutton({
+        onClick:function () {
+            $.messager.progress();	// 显示进度条
+
+            $("#upfoods").form("submit",{
+                url:"upfoodpsd",
+                success:function (data) {
+                    $.messager.progress('close');	// 如果提交成功则隐藏进度条
+                    var json = JSON.parse(data);
+                    if (json.code==200){
+                        alert(json.msg);
+                        $("#upfoodpsd").dialog({
+                            closed:true,
+                        })
+                        $("#tab1").datagrid("reload");
+
+                    }else {
+                        alert(jso.msg);
+                    }
+
+                }
+
+            })
+        }
+    })
+    //取消修改库存,单价按钮事件  隐藏对话框
+    $("#colesbtn").linkbutton({
+        onClick:function () {
+            $("#upfoodpsd").dialog({
+                closed:true,
+            })
+        }
+    })
+    //添加新的食物
+    $("#addfood").linkbutton({
+        onClick:function () {
+            $("#ddaddfood").dialog({
+                closed:false,
+            })
+            $("#addnewfood").form("clear")
+        }
+    })
+    //取消添加新的食物 对话框隐藏
+    $("#clobtn").linkbutton({
+        onClick:function () {
+            $("#ddaddfood").dialog({
+                closed:true,
+            })
+        }
+    })
+    //点击添加食物按钮 添加新的食物事件
+    $("#addbtn").linkbutton({
+        onClick:function () {
+            $.messager.progress();
+            $("#addnewfood").form("submit",{
+                url:"addfood",
+                success: function(data){
+                    $.messager.progress('close');
+                    var json =JSON.parse(data);
+                    if (json.code==200){
+                        alert(json.msg);
+                        $("#ddaddfood").dialog({
+                            closed:true,
+                        })
+                        $("#tab1").datagrid("reload");
+                        $("#addnewfood").form("clear")
+
+
+                    }else {
+                        alert(json.msg)
+                        $("#addnewfood").form("clear")
+
+                    }
+                }
+
+            })
+
+        }
+    })
+
+</script>
+</html>

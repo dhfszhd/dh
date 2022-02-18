@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/default/easyui.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/themes/icon.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/js/demo/demo.css}">
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.easyui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/locale/easyui-lang-zh_CN.js}"></script>
+    <title>订单查询</title>
+</head>
+<body>
+<!--表格头部按钮bar-->
+<div id="adbut" align="right">
+
+    <!--    拥有管理员,食堂管理,财务管理-->
+    <shiro:hasAnyRoles name="admin,keeper,finance ">
+        <span style="color:red" >*暂时只提供今日实时订单下载,请停止销售后再下载</span>
+
+        <a th:href="@{/dayorderexcel}" id="printexcel" class="easyui-linkbutton" data-options="size:'large'" style="background:#94d6da" >下载今日订单[EXCEL]</a>
+
+        <input  id="onlydate"  type= "text" name="onlydate" class= "easyui-datebox" required ="required" data-options="value:'currentText'" >
+        <a href="#" id="selallfood" class="easyui-linkbutton" data-options="size:'large'" >查看所有订单</a>
+    </shiro:hasAnyRoles>
+
+</div>
+<table id="tab1" class="easyui-datagrid" loadMsg="正在加载...." title="查看今日订单"
+        data-options= "url:'selordbyusna',
+                fit:true,border:false,fitColumns:true,singleSelect:true" >
+    <thead >
+    <tr>
+        <th data-options="field:'charbox',checkbox:true,align:'center'"></th>
+        <th data-options="field:'id',sortable:true,width:5,align:'center'">---</th>
+        <th data-options="field:'username',sortable:true,width:10,align:'center'">用户账号</th>
+        <th data-options="field:'name',align:'center'">用户姓名</th>
+        <th data-options="field:'phone',align:'center'">电话</th>
+        <th data-options="field:'foodname',width:10,align:'center'">食物名称</th>
+        <th data-options="field:'foodprice',align:'center'">单价(元)</th>
+        <th data-options="field:'foodtotal',width:10,align:'center'" >订购数量(份)</th>
+        <th data-options="field:'foodamount',width:10,align:'center'" >订单金额(元)</th>
+        <th data-options="field:'ordertime',width:10,align:'center'" >下单时间</th>
+        <th data-options="field:'orderdisable',width:10,align:'center' ,formatter:isok ">是否生效</th>
+
+    </tr>
+    </thead>
+</table>
+</body>
+<script>
+    function isok(value,row,index) {
+        if (value=='true'){
+            return"订单生效";
+        }else {
+            return "订单失效";
+        }
+    }
+    //设置表格的默认属性,开启分页
+    $("#tab1").datagrid({
+        toolbar:"#adbut",
+    })
+    //按钮查看所有订单 事件
+    $("#selallfood").linkbutton({
+        onClick:function () {
+
+            $("#tab1").datagrid({
+                pagination:true,
+                url:"selordall",
+                queryParams:{'onlydate':$("#onlydate").val()}
+
+            })
+        }
+    })
+
+
+</script>
+</html>

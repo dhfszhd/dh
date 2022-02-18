@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dhf.dh.mapper.AddressMapper">
+<!--    如果对象是空的话,查询所有是true取餐地点,如果禁用状态不是空话,查询所有-->
+    <select id="selall" resultType="com.dhf.dh.entity.Address">
+        select  id,
+                mealaddress,
+                addressdisable
+        from address
+        where 1=1
+        <if test="id !=null and id !=''">
+            and id = #{id}
+        </if>
+        <if test="mealaddress !=null "  >
+            and mealaddress= #{mealaddress}
+        </if>
+        <if test="addressdisable ==null || addressdisable==''"  >
+           and addressdisable= "true"
+        </if>
+    </select>
+<!--添加取餐地点,只需要提供新的地点即可-->
+    <insert id="insadd" >
+        insert into address(mealaddress,addressdisable)
+        values (#{mealaddress},"true")
+    </insert>
+<!--    更新取餐地点的状态-->
+    <update id="upadd" >
+        update address
+        set addressdisable=#{addressdisable}
+        where id=#{id}
+    </update>
+</mapper>
